@@ -17,6 +17,27 @@ class CheckoutFacade {
         // 2. If they are, process the payment using `paymentService.processPayment()`.
         // 3. If payment is successful, arrange shipping using `shippingService.arrangeShipping()`.
         // 4. Log the result of each step. If a step fails, log it and stop.
+        console.log("CheckoutFacade: Starting order placement...");
+        const stockOk = this.inventoryService.checkStock(orderDetails.productIds);
+        if(!stockOk) {
+            console.log("CheckoutFacade: Order failed - items are out of stock.");
+            return false;
+        }
+        console.log("CheckoutFacade: Inventory check passed.");
+        const paymentOk = this.paymentService.processPayment(orderDetails.userId, orderDetails.amout);
+        if(!paymentOk) {
+            console.log("CheckoutFacade: Order failed - payment unsuccessfull.");
+            return false;
+        }
+        console.log("CheckoutFacade: Payment processed successfully.");
+        const shippingOk = this.shippingService.arrangeShipping(orderDetails.userId, orderDetails.shippingInfo);
+        if(!shippingOk) {
+            console.log("ChekcoutFacade: Order failed - shipping failed.");
+            return false;
+        }
+        console.log("CheckoutFacade: Shipping arranged successfully.");
+        console.log("CheckoutFacade: Order successfully");
+        return true;
     }
 }
 
